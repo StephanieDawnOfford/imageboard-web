@@ -8,10 +8,13 @@ public class RegisterModel : PageModel
 {
     private readonly AppDatabase _db;
 
-    public RegisterModel(AppDatabase db)
+    public RegisterModel(AppDatabase db, OAuthProviderStatus oauth)
     {
         _db = db;
+        OAuth = oauth;
     }
+
+    public OAuthProviderStatus OAuth { get; }
 
     [BindProperty]
     public string Email { get; set; } = string.Empty;

@@ -1,0 +1,23 @@
+@model OAuthProviderStatus
+@if (Model.Google || Model.Microsoft || Model.Facebook || Model.X)
+{
+    <hr />
+    <div class="d-flex flex-column gap-2">
+        @if (Model.Google)
+        {
+            <a class="btn btn-outline-dark" href="/ExternalLogin/Challenge?provider=Google">Continue with Google</a>
+        }
+        @if (Model.Microsoft)
+        {
+            <a class="btn btn-outline-dark" href="/ExternalLogin/Challenge?provider=Microsoft">Continue with Microsoft</a>
+        }
+        @if (Model.Facebook)
+        {
+            <a class="btn btn-outline-dark" href="/ExternalLogin/Challenge?provider=Facebook">Continue with Facebook</a>
+        }
+        @if (Model.X)
+        {
+            <a class="btn btn-outline-dark" href="/ExternalLogin/Challenge?provider=X">Continue with X</a>
+        }
+    </div>
+}

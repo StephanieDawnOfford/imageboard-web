@@ -8,10 +8,13 @@ public class LoginModel : PageModel
 {
     private readonly AppDatabase _db;
 
-    public LoginModel(AppDatabase db)
+    public LoginModel(AppDatabase db, OAuthProviderStatus oauth)
     {
         _db = db;
+        OAuth = oauth;
     }
+
+    public OAuthProviderStatus OAuth { get; }
 
     [BindProperty]
     public string Email { get; set; } = string.Empty;

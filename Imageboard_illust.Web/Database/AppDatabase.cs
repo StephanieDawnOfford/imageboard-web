@@ -127,6 +127,23 @@ namespace Imageboard_illust.Database
             return GetUserById(userId);
         }
 
+        /// <summary>Find a user by email, or create one for a first-time OAuth sign-in.
+        /// OAuth users never set a password, so a random, unusable hash fills the NOT NULL column.</summary>
+        public User GetOrCreateOAuthUser(string email)
+        {
+            var existing = GetUserByEmail(email);
+            if (existing != null) return existing;
+
+            string passwordHash = HashPassword(Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)));
+            using var cmd = Cmd("INSERT INTO users (email, password_hash) VALUES ($email, $hash); SELECT last_insert_rowid();");
+            cmd.Parameters.AddWithValue("$email", email);
+            cmd.Parameters.AddWithValue("$hash", passwordHash);
+            int userId = Convert.ToInt32(cmd.ExecuteScalar());
+
+            CreateExampleBoard(userId);
+            return GetUserById(userId)!;
+        }
+
         public User? LoginUser(string email, string password)
         {
             var user = GetUserByEmail(email);
