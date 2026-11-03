@@ -1,0 +1,123 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+.board-canvas {
+  position: relative;
+  min-height: 600px;
+  background-color: #f0f0f3;
+  background-image: linear-gradient(to right, #e2e2e8 1px, transparent 1px),
+                     linear-gradient(to bottom, #e2e2e8 1px, transparent 1px);
+  background-size: 40px 40px;
+  border: 1px solid #d7d7df;
+  border-radius: 6px;
+  overflow: auto;
+}
+
+.board-card {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #b8b8c0;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  min-width: 80px;
+  min-height: 68px;
+  overflow: hidden;
+}
+
+.board-card-title {
+  display: flex;
+  align-items: center;
+  height: 26px;
+  background: #20232a;
+  color: #e4e4e8;
+  font-size: 0.75rem;
+  cursor: move;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.board-card-badge {
+  background: #0078d4;
+  color: #fff;
+  font-weight: bold;
+  padding: 0 6px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.board-card-name {
+  flex: 1;
+  padding: 0 6px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.board-card-close {
+  background: #b92316;
+  color: #fff;
+  border: none;
+  width: 24px;
+  height: 100%;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.board-card-image {
+  flex: 1;
+  background: #26262a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.board-card-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.board-card-resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 14px;
+  height: 14px;
+  cursor: nwse-resize;
+  background: linear-gradient(135deg, transparent 50%, #888 50%);
+}

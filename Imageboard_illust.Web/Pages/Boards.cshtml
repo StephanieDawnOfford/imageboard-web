@@ -1,0 +1,92 @@
+@page
+@model Imageboard_illust.Web.Pages.BoardsModel
+@{
+    ViewData["Title"] = "My Boards";
+}
+<div class="mt-5">
+    <h2>My Boards</h2>
+
+    @if (!string.IsNullOrEmpty(Model.FlashMessage))
+    {
+        <div class="alert alert-info">@Model.FlashMessage</div>
+    }
+
+    @if (!Model.IsAuthenticated)
+    {
+        <div class="alert alert-warning">Please <a asp-page="/Login">login</a> to view your boards.</div>
+    }
+    else
+    {
+        <div class="mb-4">
+            <form method="post" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label asp-for="NewBoardName" class="form-label">Board name</label>
+                    <input asp-for="NewBoardName" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="NewBoardType" class="form-label">Board type</label>
+                    <select asp-for="NewBoardType" class="form-select">
+                        <option value="individual">Individual</option>
+                        <option value="shared">Shared</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-success">Create board</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="mb-4">
+            <form method="post" asp-page-handler="Join" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label asp-for="ShareCodeInput" class="form-label">Join a board with a share code</label>
+                    <input asp-for="ShareCodeInput" class="form-control" placeholder="e.g. AB12CD" />
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-outline-primary">Join board</button>
+                </div>
+            </form>
+        </div>
+
+        @if (Model.Boards.Count == 0)
+        {
+            <div class="alert alert-info">No boards yet. Create one to get started.</div>
+        }
+        else
+        {
+            <table class="table table-bordered table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Public</th>
+                        <th>Created</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var board in Model.Boards)
+                    {
+                        <tr>
+                            <td>@board.Id</td>
+                            <td><a asp-page="/Board" asp-route-id="@board.Id">@board.Name</a></td>
+                            <td>@board.BoardType</td>
+                            <td>@(board.IsPublic ? "Yes" : "No")</td>
+                            <td>@board.CreatedAt</td>
+                            <td>
+                                @if (board.OwnerId == Model.CurrentUserId)
+                                {
+                                    <form method="post" asp-page-handler="Share" class="d-inline">
+                                        <input type="hidden" name="boardId" value="@board.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary">Share</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
+</div>

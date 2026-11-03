@@ -1,0 +1,72 @@
+@page "{id:int}"
+@model Imageboard_illust.Web.Pages.BoardModel
+@{
+    ViewData["Title"] = Model.CurrentBoard?.Name ?? "Board";
+}
+
+<div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+    <div>
+        <h2 class="mb-0">@Model.CurrentBoard.Name</h2>
+        <small class="text-muted">
+            #@Model.CurrentBoard.Id.ToString("D3") &middot; @Model.CurrentBoard.BoardType
+            @(Model.CanEdit ? "" : "(view only)")
+        </small>
+    </div>
+    <div>
+        <a class="btn btn-outline-secondary btn-sm" asp-page="/Boards">&larr; All boards</a>
+        @if (Model.CanEdit)
+        {
+            <form method="post" asp-page-handler="DeleteBoard" class="d-inline"
+                  onsubmit="return confirm('Delete this board and all its images?');">
+                <input type="hidden" name="id" value="@Model.CurrentBoard.Id" />
+                <button type="submit" class="btn btn-outline-danger btn-sm">Delete board</button>
+            </form>
+        }
+    </div>
+</div>
+
+@if (Model.CanEdit)
+{
+    <form method="post" asp-page-handler="Upload" enctype="multipart/form-data"
+          class="mb-3 d-flex gap-2 align-items-center">
+        <input type="hidden" name="id" value="@Model.CurrentBoard.Id" />
+        <input type="file" name="files" multiple accept=".png,.jpg,.jpeg,.gif,.bmp,.webp"
+               class="form-control form-control-sm" style="max-width:360px" />
+        <button type="submit" class="btn btn-primary btn-sm">Upload images</button>
+    </form>
+}
+
+@Html.AntiForgeryToken()
+
+<div id="board-canvas" class="board-canvas" data-board-id="@Model.CurrentBoard.Id"
+     data-can-edit="@(Model.CanEdit ? "1" : "0")">
+    @foreach (var item in Model.Items)
+    {
+        <div class="board-card" data-item-id="@item.Id"
+             style="left:@(item.X)px; top:@(item.Y)px; width:@(item.Width)px; height:@(item.Height)px;">
+            <div class="board-card-title">
+                <span class="board-card-badge">#@item.Id.ToString("D3")</span>
+                <span class="board-card-name">@item.Name</span>
+                @if (Model.CanEdit)
+                {
+                    <button type="button" class="board-card-close" title="Delete">&times;</button>
+                }
+            </div>
+            <div class="board-card-image">
+                <img src="/boardimages/@Model.CurrentBoard.Id/@item.FileName" alt="@item.Name" draggable="false" />
+            </div>
+            @if (Model.CanEdit)
+            {
+                <div class="board-card-resize"></div>
+            }
+        </div>
+    }
+    @if (Model.Items.Count == 0)
+    {
+        <p class="text-muted p-3">No images yet. @(Model.CanEdit ? "Upload some above to get started." : "")</p>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/board.js"></script>
+}
