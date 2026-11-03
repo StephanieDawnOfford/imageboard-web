@@ -27,27 +27,20 @@ namespace Imageboard_illust.Database
     {
         public string DataDir { get; }
         private readonly string _dbPath;
-        private SqliteConnection? _conn;
+        private readonly string _connectionString;
 
         public AppDatabase()
         {
-            DataDir = Path.Combine(
+            DataDir = Environment.GetEnvironmentVariable("IMAGEBOARD_DATA_DIR") ?? Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "Imageboard_illust");
             _dbPath = Path.Combine(DataDir, "board.db");
+            _connectionString = $"Data Source={_dbPath}";
 
             Directory.CreateDirectory(DataDir);
-            Open();
-            EnsureSchema();
-        }
-
-        private void Open()
-        {
-            _conn = new SqliteConnection($"Data Source={_dbPath}");
-            _conn.Open();
+            // WAL mode is persisted in the database file itself, so this only needs to run once.
             Exec("PRAGMA journal_mode=WAL;");
-            Exec("PRAGMA synchronous=NORMAL;");
-            Exec("PRAGMA foreign_keys=ON;");
+            EnsureSchema();
         }
 
         private void EnsureSchema()
@@ -554,13 +547,26 @@ namespace Imageboard_illust.Database
 
         private void Exec(string sql) { using var c = Cmd(sql); c.ExecuteNonQuery(); }
 
+        // Opens a fresh connection per call instead of sharing one across the app's lifetime.
+        // AppDatabase is registered as a singleton and handles concurrent HTTP requests, so a single
+        // shared SqliteConnection would let concurrent requests corrupt each other's query state.
+        // SQLite's WAL mode (set once, above) safely handles multiple short-lived connections.
         private SqliteCommand Cmd(string sql)
         {
-            var c = _conn!.CreateCommand();
-            c.CommandText = sql;
-            return c;
+            var conn = new SqliteConnection(_connectionString);
+            conn.Open();
+            using (var pragma = conn.CreateCommand())
+            {
+                pragma.CommandText = "PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;";
+                pragma.ExecuteNonQuery();
+            }
+
+            var cmd = conn.CreateCommand();
+            cmd.CommandText = sql;
+            cmd.Disposed += (_, _) => conn.Dispose();
+            return cmd;
         }
 
-        public void Dispose() { _conn?.Close(); _conn?.Dispose(); }
+        public void Dispose() { }
     }
 }

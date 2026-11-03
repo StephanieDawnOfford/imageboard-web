@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="Imageboard_illust.Web.UiTests/Imageboard_illust.Web.UiTests.csproj" />
   <Project Path="Imageboard_illust.Web/Imageboard_illust.Web.csproj" />
 </Solution>
